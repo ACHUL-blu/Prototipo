@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Horarios y Turnos</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background-color: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            background-color: var(--light);
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--secondary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        /* Visualización de horarios */
+        .schedule-view {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .schedule-day {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .day-label {
+            width: 100px;
+            font-weight: 600;
+        }
+        
+        .time-blocks {
+            display: flex;
+            flex: 1;
+            height: 40px;
+            position: relative;
+        }
+        
+        .time-block {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .time-block:hover {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+        
+        .time-block.base {
+            background-color: #3498db;
+        }
+        
+        .time-block.section {
+            background-color: #2ecc71;
+        }
+        
+        .time-block.position {
+            background-color: #e67e22;
+        }
+        
+        .time-block.employee {
+            background-color: #9b59b6;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sistema de Gestión</h2>
+                <div class="user-info">
+                    <div id="user-role">Administrador</div>
+                    <div id="user-name">Juan Pérez</div>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="dashboard">
+                    <i>📊</i> Dashboard
+                </li>
+                <li class="menu-item" data-section="turnos">
+                    <i>🕒</i> Turnos y Horarios
+                </li>
+                <li class="menu-item" data-section="reglas">
+                    <i>📋</i> Reglas
+                </li>
+                <li class="menu-item" data-section="asistencias">
+                    <i>✅</i> Asistencias
+                </li>
+                <li class="menu-item" data-section="vacaciones">
+                    <i>🏖️</i> Vacaciones y Permisos
+                </li>
+                <li class="menu-item" data-section="reportes">
+                    <i>📈</i> Reportes y Auditoría
+                </li>
+                <li class="menu-item" data-section="configuracion">
+                    <i>⚙️</i> Configuración
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-actions">
+                    <button class="btn btn-primary" id="notifications-btn">🔔 Notificaciones</button>
+                    <button class="btn btn-warning" id="logout-btn">Cerrar Sesión</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        Resumen General
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div style="text-align: center; padding: 15px; background: #e8f4fd; border-radius: 8px;">
+                                <h3>45</h3>
+                                <p>Empleados Activos</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #e8f6f3; border-radius: 8px;">
+                                <h3>3</h3>
+                                <p>Turnos Activos</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #fef9e7; border-radius: 8px;">
+                                <h3>2</h3>
+                                <p>Solicitudes Pendientes</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #fbeeee; border-radius: 8px;">
+                                <h3>1</h3>
+                                <p>Conflictos por Resolver</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Horarios por Sección
+                    </div>
+                    <div class="card-body">
+                        <div class="schedule-view">
+                            <div class="schedule-day">
+                                <div class="day-label">Lunes</div>
+                                <div class="time-blocks">
+                                    <div class="time-block base" style="width: 50%;" title="Turno Base: 08:00-12:00">Base: 08:00-12:00</div>
+                                    <div class="time-block section" style="width: 50%;" title="Sección Logística: 12:00-16:00">Logística: 12:00-16:00</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-label">Martes</div>
+                                <div class="time-blocks">
+                                    <div class="time-block base" style="width: 50%;" title="Turno Base: 08:00-12:00">Base: 08:00-12:00</div>
+                                    <div class="time-block position" style="width: 30%;" title="Puesto Supervisor: 12:00-15:00">Supervisor: 12:00-15:00</div>
+                                    <div class="time-block employee" style="width: 20%;" title="Empleado Especial: 15:00-16:00">Especial: 15:00-16:00</div>
+                                </div>
+                            </div>
+                            <!-- Más días de la semana -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Turnos y Horarios Section -->
+            <div id="turnos-section" class="content-section" style="display: none;">
+                <div class="tabs">
+                    <div class="tab active" data-tab="visualizacion">Visualización</div>
+                    <div class="tab" data-tab="gestion">Gestión de Turnos</div>
+                    <div class="tab" data-tab="rotaciones">Plantillas de Rotación</div>
+                </div>
+                
+                <div id="visualizacion-tab" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            Horarios por Nivel de Alcance
+                            <div>
+                                <select id="scope-select">
+                                    <option value="empresa">Empresa</option>
+                                    <option value="seccion">Sección</option>
+                                    <option value="puesto">Puesto</option>
+                                    <option value="empleado">Empleado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="schedule-container">
+                                <!-- Los horarios se cargarán aquí dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="gestion-tab" class="tab-content" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            Crear o Modificar Turno
+                        </div>
+                        <div class="card-body">
+                            <form id="turno-form">
+                                <div class="form-group">
+                                    <label for="tipo-turno">Tipo de Turno</label>
+                                    <select id="tipo-turno" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option value="base">Base (Empresa)</option>
+                                        <option value="seccion">Sección</option>
+                                        <option value="puesto">Puesto</option>
+                                        <option value="empleado">Empleado Individual</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="nombre-turno">Nombre del Turno</label>
+                                    <input type="text" id="nombre-turno" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="hora-inicio">Hora de Inicio</label>
+                                    <input type="time" id="hora-inicio" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="hora-fin">Hora de Fin</label>
+                                    <input type="time" id="hora-fin" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="descansos">Descansos (minutos)</label>
+                                    <input type="number" id="descansos" min="0" value="60">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="plantilla-rotacion">Plantilla de Rotación (opcional)</label>
+                                    <select id="plantilla-rotacion">
+                                        <option value="">Sin plantilla</option>
+                                        <option value="doble">Rotación Doble</option>
+                                        <option value="triple">Rotación Triple</option>
+                                        <option value="fija">Fija</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Guardar Turno</button>
+                                    <button type="button" class="btn btn-success" id="guardar-plantilla-btn">Guardar como Plantilla</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Turnos
+                        </div>
+                        <div class="card-body">
+                            <table id="turnos-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Horario</th>
+                                        <th>Descansos</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Los turnos se cargarán aquí dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="rotaciones-tab" class="tab-content" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            Gestión de Plantillas de Rotación
+                        </div>
+                        <div class="card-body">
+                            <form id="rotacion-form">
+                                <div class="form-group">
+                                    <label for="nombre-rotacion">Nombre de la Plantilla</label>
+                                    <input type="text" id="nombre-rotacion" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ciclo-rotacion">Ciclo</label>
+                                    <select id="ciclo-rotacion" required>
+                                        <option value="diario">Diario</option>
+                                        <option value="semanal">Semanal</option>
+                                        <option value="quincenal">Quincenal</option>
+                                        <option value="mensual">Mensual</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="secuencia-turnos">Secuencia de Turnos</label>
+                                    <textarea id="secuencia-turnos" placeholder="Ej: Mañana → Tarde → Noche" required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="alcance-rotacion">Alcance</label>
+                                    <select id="alcance-rotacion" required>
+                                        <option value="empresa">Empresa</option>
+                                        <option value="seccion">Sección</option>
+                                        <option value="puesto">Puesto</option>
+                                        <option value="empleado">Empleado</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Guardar Plantilla</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Más secciones (Reglas, Asistencias, Vacaciones, Reportes, Configuración) -->
+            <!-- Por brevedad, solo se muestra el esqueleto -->
+            <div id="reglas-section" class="content-section" style="display: none;">
+                <h2>Gestión de Reglas</h2>
+                <!-- Contenido de reglas -->
+            </div>
+            
+            <div id="asistencias-section" class="content-section" style="display: none;">
+                <h2>Registro de Asistencias</h2>
+                <!-- Contenido de asistencias -->
+            </div>
+            
+            <div id="vacaciones-section" class="content-section" style="display: none;">
+                <h2>Vacaciones y Permisos</h2>
+                <!-- Contenido de vacaciones -->
+            </div>
+            
+            <div id="reportes-section" class="content-section" style="display: none;">
+                <h2>Reportes y Auditoría</h2>
+                <!-- Contenido de reportes -->
+            </div>
+            
+            <div id="configuracion-section" class="content-section" style="display: none;">
+                <h2>Configuración del Sistema</h2>
+                <!-- Contenido de configuración -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para detalles de turno -->
+    <div class="modal" id="turno-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Detalles del Turno</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido dinámico del modal -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const turnosPrecargados = [
+            { id: 1, nombre: "Turno Base", tipo: "base", inicio: "08:00", fin: "16:00", descanso: 60, plantilla: null },
+            { id: 2, nombre: "Logística Mañana", tipo: "seccion", inicio: "07:00", fin: "15:00", descanso: 45, plantilla: "doble" },
+            { id: 3, nombre: "Supervisor Tarde", tipo: "puesto", inicio: "12:00", fin: "20:00", descanso: 60, plantilla: "fija" }
+        ];
+        
+        const plantillasRotacion = [
+            { id: 1, nombre: "Rotación Doble", ciclo: "semanal", secuencia: "Mañana → Tarde", alcance: "seccion" },
+            { id: 2, nombre: "Rotación Triple", ciclo: "semanal", secuencia: "Mañana → Tarde → Noche", alcance: "empresa" },
+            { id: 3, nombre: "Fijo Diurno", ciclo: "permanente", secuencia: "Siempre Mañana", alcance: "puesto" }
+        ];
+        
+        const reglasLaborales = [
+            { id: 1, nombre: "Jornada Máxima", tipo: "laboral", descripcion: "Máximo 48 horas semanales", alcance: "empresa", prioridad: "alta" },
+            { id: 2, nombre: "Descanso Mínimo", tipo: "laboral", descripcion: "Mínimo 8 horas entre turnos", alcance: "empresa", prioridad: "alta" }
+        ];
+        
+        const reglasPersonalizables = [
+            { id: 3, nombre: "Supervisores Horas Extra", tipo: "personalizable", descripcion: "Supervisores pueden exceder 1 hora diaria", alcance: "puesto", prioridad: "media" },
+            { id: 4, nombre: "Temporada Alta", tipo: "personalizable", descripcion: "En temporada alta se permiten 10 horas diarias", alcance: "empresa", prioridad: "baja" }
+        ];
+        
+        // Estado de la aplicación
+        let currentUser = {
+            id: 1,
+            nombre: "Juan Pérez",
+            rol: "administrador", // administrador, formador, colaborador, rrhh
+            seccion: "global"
+        };
+        
+        let turnos = [...turnosPrecargados];
+        let plantillas = [...plantillasRotacion];
+        let reglas = [...reglasLaborales, ...reglasPersonalizables];
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navegación del sidebar
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remover clase active de todos los items
+                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                    // Agregar clase active al item clickeado
+                    this.classList.add('active');
+                    
+                    // Ocultar todas las secciones
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    // Mostrar la sección correspondiente
+                    const sectionId = this.getAttribute('data-section') + '-section';
+                    document.getElementById(sectionId).style.display = 'block';
+                    
+                    // Actualizar título de página
+                    document.getElementById('page-title').textContent = this.textContent.trim();
+                    
+                    // Cargar datos específicos de la sección
+                    cargarSeccion(this.getAttribute('data-section'));
+                });
+            });
+            
+            // Navegación de pestañas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remover clase active de todas las pestañas
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    // Agregar clase active a la pestaña clickeada
+                    this.classList.add('active');
+                    
+                    // Ocultar todos los contenidos de pestañas
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Mostrar el contenido correspondiente
+                    document.getElementById(tabId + '-tab').style.display = 'block';
+                });
+            });
+            
+            // Formulario de turnos
+            document.getElementById('turno-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                crearTurno();
+            });
+            
+            // Botón guardar como plantilla
+            document.getElementById('guardar-plantilla-btn').addEventListener('click', function() {
+                guardarTurnoComoPlantilla();
+            });
+            
+            // Formulario de rotaciones
+            document.getElementById('rotacion-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                crearPlantillaRotacion();
+            });
+            
+            // Selector de alcance
+            document.getElementById('scope-select').addEventListener('change', function() {
+                cargarHorariosPorAlcance(this.value);
+            });
+            
+            // Modal
+            document.querySelector('.modal-close').addEventListener('click', function() {
+                document.getElementById('turno-modal').style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('turno-modal');
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Inicializar la aplicación
+            cargarSeccion('dashboard');
+        });
+        
+        // Funciones para cargar secciones
+        function cargarSeccion(seccion) {
+            switch(seccion) {
+                case 'dashboard':
+                    cargarDashboard();
+                    break;
+                case 'turnos':
+                    cargarTurnos();
+                    break;
+                case 'reglas':
+                    cargarReglas();
+                    break;
+                case 'asistencias':
+                    cargarAsistencias();
+                    break;
+                case 'vacaciones':
+                    cargarVacaciones();
+                    break;
+                case 'reportes':
+                    cargarReportes();
+                    break;
+                case 'configuracion':
+                    cargarConfiguracion();
+                    break;
+            }
+        }
+        
+        function cargarDashboard() {
+            // Cargar datos del dashboard
+            console.log("Cargando dashboard...");
+        }
+        
+        function cargarTurnos() {
+            // Cargar lista de turnos
+            const tablaTurnos = document.querySelector('#turnos-table tbody');
+            tablaTurnos.innerHTML = '';
+            
+            turnos.forEach(turno => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${turno.nombre}</td>
+                    <td>${turno.tipo}</td>
+                    <td>${turno.inicio} - ${turno.fin}</td>
+                    <td>${turno.descanso} min</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editarTurno(${turno.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarTurno(${turno.id})">Eliminar</button>
+                    </td>
+                `;
+                tablaTurnos.appendChild(fila);
+            });
+            
+            // Cargar horarios por alcance
+            cargarHorariosPorAlcance(document.getElementById('scope-select').value);
+        }
+        
+        function cargarHorariosPorAlcance(alcance) {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = '';
+            
+            // Generar visualización de horarios según el alcance
+            const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            
+            dias.forEach(dia => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'schedule-day';
+                
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'day-label';
+                dayLabel.textContent = dia;
+                
+                const timeBlocks = document.createElement('div');
+                timeBlocks.className = 'time-blocks';
+                
+                // Generar bloques de tiempo según el alcance
+                if (alcance === 'empresa') {
+                    const block = document.createElement('div');
+                    block.className = 'time-block base';
+                    block.style.width = '100%';
+                    block.textContent = 'Base: 08:00-16:00';
+                    block.setAttribute('title', 'Turno Base: 08:00-16:00');
+                    block.addEventListener('click', () => mostrarDetallesTurno(1));
+                    timeBlocks.appendChild(block);
+                } else if (alcance === 'seccion') {
+                    const block1 = document.createElement('div');
+                    block1.className = 'time-block base';
+                    block1.style.width = '40%';
+                    block1.textContent = 'Base: 08:00-12:00';
+                    block1.setAttribute('title', 'Turno Base: 08:00-12:00');
+                    block1.addEventListener('click', () => mostrarDetallesTurno(1));
+                    
+                    const block2 = document.createElement('div');
+                    block2.className = 'time-block section';
+                    block2.style.width = '60%';
+                    block2.textContent = 'Logística: 12:00-16:00';
+                    block2.setAttribute('title', 'Sección Logística: 12:00-16:00');
+                    block2.addEventListener('click', () => mostrarDetallesTurno(2));
+                    
+                    timeBlocks.appendChild(block1);
+                    timeBlocks.appendChild(block2);
+                } else if (alcance === 'puesto') {
+                    const block1 = document.createElement('div');
+                    block1.className = 'time-block base';
+                    block1.style.width = '30%';
+                    block1.textContent = 'Base: 08:00-11:00';
+                    block1.setAttribute('title', 'Turno Base: 08:00-11:00');
+                    block1.addEventListener('click', () => mostrarDetallesTurno(1));
+                    
+                    const block2 = document.createElement('div');
+                    block2.className = 'time-block section';
+                    block2.style.width = '40%';
+                    block2.textContent = 'Logística: 11:00-15:00';
+                    block2.setAttribute('title', 'Sección Logística: 11:00-15:00');
+                    block2.addEventListener('click', () => mostrarDetallesTurno(2));
+                    
+                    const block3 = document.createElement('div');
+                    block3.className = 'time-block position';
+                    block3.style.width = '30%';
+                    block3.textContent = 'Supervisor: 15:00-17:00';
+                    block3.setAttribute('title', 'Puesto Supervisor: 15:00-17:00');
+                    block3.addEventListener('click', () => mostrarDetallesTurno(3));
+                    
+                    timeBlocks.appendChild(block1);
+                    timeBlocks.appendChild(block2);
+                    timeBlocks.appendChild(block3);
+                } else if (alcance === 'empleado') {
+                    // Para empleado, mostrar turno personalizado
+                    const block = document.createElement('div');
+                    block.className = 'time-block employee';
+                    block.style.width = '100%';
+                    block.textContent = 'Personalizado: 09:00-17:00';
+                    block.setAttribute('title', 'Turno Personalizado: 09:00-17:00');
+                    block.addEventListener('click', () => mostrarDetallesTurno(4));
+                    timeBlocks.appendChild(block);
+                }
+                
+                dayElement.appendChild(dayLabel);
+                dayElement.appendChild(timeBlocks);
+                container.appendChild(dayElement);
+            });
+        }
+        
+        function cargarReglas() {
+            // Cargar gestión de reglas
+            console.log("Cargando reglas...");
+        }
+        
+        function cargarAsistencias() {
+            // Cargar módulo de asistencias
+            console.log("Cargando asistencias...");
+        }
+        
+        function cargarVacaciones() {
+            // Cargar módulo de vacaciones
+            console.log("Cargando vacaciones...");
+        }
+        
+        function cargarReportes() {
+            // Cargar módulo de reportes
+            console.log("Cargando reportes...");
+        }
+        
+        function cargarConfiguracion() {
+            // Cargar configuración
+            console.log("Cargando configuración...");
+        }
+        
+        // Funciones para gestionar turnos
+        function crearTurno() {
+            const tipo = document.getElementById('tipo-turno').value;
+            const nombre = document.getElementById('nombre-turno').value;
+            const inicio = document.getElementById('hora-inicio').value;
+            const fin = document.getElementById('hora-fin').value;
+            const descanso = document.getElementById('descansos').value;
+            const plantilla = document.getElementById('plantilla-rotacion').value;
+            
+            // Validar que el turno no entre en conflicto con reglas laborales
+            if (validarTurnoConReglas(inicio, fin, descanso)) {
+                const nuevoTurno = {
+                    id: turnos.length + 1,
+                    nombre,
+                    tipo,
+                    inicio,
+                    fin,
+                    descanso: parseInt(descanso),
+                    plantilla: plantilla || null
+                };
+                
+                turnos.push(nuevoTurno);
+                alert('Turno creado exitosamente');
+                document.getElementById('turno-form').reset();
+                cargarTurnos();
+            } else {
+                alert('El turno no cumple con las reglas laborales. Por favor, revise los horarios.');
+            }
+        }
+        
+        function guardarTurnoComoPlantilla() {
+            const tipo = document.getElementById('tipo-turno').value;
+            const nombre = document.getElementById('nombre-turno').value;
+            const inicio = document.getElementById('hora-inicio').value;
+            const fin = document.getElementById('hora-fin').value;
+            const descanso = document.getElementById('descansos').value;
+            
+            // Crear plantilla basada en el turno
+            const nuevaPlantilla = {
+                id: plantillas.length + 1,
+                nombre: `Plantilla: ${nombre}`,
+                ciclo: "semanal",
+                secuencia: `${inicio}-${fin}`,
+                alcance: tipo
+            };
+            
+            plantillas.push(nuevaPlantilla);
+            alert('Plantilla guardada exitosamente');
+        }
+        
+        function editarTurno(id) {
+            const turno = turnos.find(t => t.id === id);
+            if (turno) {
+                document.getElementById('tipo-turno').value = turno.tipo;
+                document.getElementById('nombre-turno').value = turno.nombre;
+                document.getElementById('hora-inicio').value = turno.inicio;
+                document.getElementById('hora-fin').value = turno.fin;
+                document.getElementById('descansos').value = turno.descanso;
+                document.getElementById('plantilla-rotacion').value = turno.plantilla || '';
+                
+                // Cambiar a la pestaña de gestión
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('[data-tab="gestion"]').classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.getElementById('gestion-tab').style.display = 'block';
+                
+                // Actualizar el formulario para edición
+                const form = document.getElementById('turno-form');
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    actualizarTurno(id);
+                };
+            }
+        }
+        
+        function actualizarTurno(id) {
+            const tipo = document.getElementById('tipo-turno').value;
+            const nombre = document.getElementById('nombre-turno').value;
+            const inicio = document.getElementById('hora-inicio').value;
+            const fin = document.getElementById('hora-fin').value;
+            const descanso = document.getElementById('descansos').value;
+            const plantilla = document.getElementById('plantilla-rotacion').value;
+            
+            // Validar que el turno no entre en conflicto con reglas laborales
+            if (validarTurnoConReglas(inicio, fin, descanso)) {
+                const index = turnos.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    turnos[index] = {
+                        id,
+                        nombre,
+                        tipo,
+                        inicio,
+                        fin,
+                        descanso: parseInt(descanso),
+                        plantilla: plantilla || null
+                    };
+                    
+                    alert('Turno actualizado exitosamente');
+                    document.getElementById('turno-form').reset();
+                    
+                    // Restaurar el comportamiento original del formulario
+                    const form = document.getElementById('turno-form');
+                    form.onsubmit = function(e) {
+                        e.preventDefault();
+                        crearTurno();
+                    };
+                    
+                    cargarTurnos();
+                }
+            } else {
+                alert('El turno no cumple con las reglas laborales. Por favor, revise los horarios.');
+            }
+        }
+        
+        function eliminarTurno(id) {
+            if (confirm('¿Está seguro de que desea eliminar este turno?')) {
+                turnos = turnos.filter(t => t.id !== id);
+                cargarTurnos();
+                alert('Turno eliminado exitosamente');
+            }
+        }
+        
+        function mostrarDetallesTurno(id) {
+            const turno = turnos.find(t => t.id === id) || 
+                         { id: 4, nombre: "Turno Personalizado", tipo: "empleado", inicio: "09:00", fin: "17:00", descanso: 60, plantilla: null };
+            
+            document.getElementById('modal-title').textContent = turno.nombre;
+            document.getElementById('modal-body').innerHTML = `
+                <p><strong>Tipo:</strong> ${turno.tipo}</p>
+                <p><strong>Horario:</strong> ${turno.inicio} - ${turno.fin}</p>
+                <p><strong>Descanso:</strong> ${turno.descanso} minutos</p>
+                <p><strong>Plantilla:</strong> ${turno.plantilla || 'Ninguna'}</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="editarTurno(${turno.id}); document.getElementById('turno-modal').style.display='none';">Editar Turno</button>
+                </div>
+            `;
+            
+            document.getElementById('turno-modal').style.display = 'flex';
+        }
+        
+        // Funciones para gestionar plantillas de rotación
+        function crearPlantillaRotacion() {
+            const nombre = document.getElementById('nombre-rotacion').value;
+            const ciclo = document.getElementById('ciclo-rotacion').value;
+            const secuencia = document.getElementById('secuencia-turnos').value;
+            const alcance = document.getElementById('alcance-rotacion').value;
+            
+            const nuevaPlantilla = {
+                id: plantillas.length + 1,
+                nombre,
+                ciclo,
+                secuencia,
+                alcance
+            };
+            
+            plantillas.push(nuevaPlantilla);
+            alert('Plantilla de rotación creada exitosamente');
+            document.getElementById('rotacion-form').reset();
+        }
+        
+        // Función para validar turnos con reglas laborales
+        function validarTurnoConReglas(inicio, fin, descanso) {
+            // Validaciones básicas de reglas laborales
+            const horaInicio = parseInt(inicio.split(':')[0]);
+            const horaFin = parseInt(fin.split(':')[0]);
+            const minutosInicio = parseInt(inicio.split(':')[1]);
+            const minutosFin = parseInt(fin.split(':')[1]);
+            
+            const duracionTotal = (horaFin * 60 + minutosFin) - (horaInicio * 60 + minutosInicio);
+            const duracionTrabajo = duracionTotal - parseInt(descanso);
+            
+            // Regla: Jornada máxima de 10 horas (600 minutos)
+            if (duracionTrabajo > 600) {
+                return false;
+            }
+            
+            // Regla: Descanso mínimo de 30 minutos
+            if (parseInt(descanso) < 30) {
+                return false;
+            }
+            
+            // Más validaciones según las reglas laborales...
+            
+            return true;
+        }
+        
+        // Funciones para simular diferentes roles de usuario
+        function cambiarRol(rol) {
+            currentUser.rol = rol;
+            document.getElementById('user-role').textContent = 
+                rol === 'administrador' ? 'Administrador' : 
+                rol === 'formador' ? 'Formador/Jefe' : 
+                rol === 'colaborador' ? 'Colaborador' : 'RRHH';
+            
+            // Actualizar permisos según el rol
+            actualizarPermisos();
+        }
+        
+        function actualizarPermisos() {
+            // Ejemplo: Ocultar/mostrar elementos según el rol
+            const elementosAdmin = document.querySelectorAll('.admin-only');
+            const elementosFormador = document.querySelectorAll('.formador-only');
+            const elementosColaborador = document.querySelectorAll('.colaborador-only');
+            const elementosRRHH = document.querySelectorAll('.rrhh-only');
+            
+            // Implementar lógica de permisos según el rol
+            // Por simplicidad, no se implementa completamente en este ejemplo
+        }
+    </script>
+</body>
+</html>            M
