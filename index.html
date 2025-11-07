@@ -226,44 +226,55 @@
         }
         
         /* Visualización de horarios */
-        .schedule-view {
+        .scope-navigation {
             display: flex;
-            flex-direction: column;
+            margin-bottom: 20px;
             gap: 10px;
         }
         
-        .schedule-day {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .scope-btn {
+            padding: 10px 15px;
+            background-color: var(--light);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
         }
         
-        .day-label {
-            width: 100px;
-            font-weight: 600;
+        .scope-btn.active {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
         }
         
-        .time-blocks {
-            display: flex;
-            flex: 1;
-            height: 40px;
+        .calendar-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #ddd;
+            border: 1px solid #ddd;
+        }
+        
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
+            padding: 8px;
             position: relative;
         }
         
-        .time-block {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+        .day-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 3px;
         }
         
-        .time-block:hover {
-            opacity: 0.8;
-            transform: scale(1.02);
+        .time-block {
+            padding: 4px 6px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            color: white;
+            cursor: pointer;
         }
         
         .time-block.base {
@@ -338,6 +349,10 @@
             .main-content {
                 padding: 10px;
             }
+            
+            .calendar-view {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -354,25 +369,25 @@
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-item active" data-section="dashboard">
-                    <i>📊</i> Dashboard
+                    <span>Dashboard</span>
                 </li>
                 <li class="menu-item" data-section="turnos">
-                    <i>🕒</i> Turnos y Horarios
+                    <span>Turnos y Horarios</span>
                 </li>
                 <li class="menu-item" data-section="reglas">
-                    <i>📋</i> Reglas
+                    <span>Reglas</span>
                 </li>
                 <li class="menu-item" data-section="asistencias">
-                    <i>✅</i> Asistencias
+                    <span>Asistencias</span>
                 </li>
                 <li class="menu-item" data-section="vacaciones">
-                    <i>🏖️</i> Vacaciones y Permisos
+                    <span>Vacaciones y Permisos</span>
                 </li>
                 <li class="menu-item" data-section="reportes">
-                    <i>📈</i> Reportes y Auditoría
+                    <span>Reportes y Auditoría</span>
                 </li>
                 <li class="menu-item" data-section="configuracion">
-                    <i>⚙️</i> Configuración
+                    <span>Configuración</span>
                 </li>
             </ul>
         </div>
@@ -382,7 +397,7 @@
             <div class="header">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="user-actions">
-                    <button class="btn btn-primary" id="notifications-btn">🔔 Notificaciones</button>
+                    <button class="btn btn-primary" id="notifications-btn">Notificaciones (3)</button>
                     <button class="btn btn-warning" id="logout-btn">Cerrar Sesión</button>
                 </div>
             </div>
@@ -397,7 +412,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                             <div style="text-align: center; padding: 15px; background: #e8f4fd; border-radius: 8px;">
                                 <h3>45</h3>
-                                <p>Empleados Activos</p>
+                                <p>Colaboradores Activos</p>
                             </div>
                             <div style="text-align: center; padding: 15px; background: #e8f6f3; border-radius: 8px;">
                                 <h3>3</h3>
@@ -417,27 +432,45 @@
                 
                 <div class="card">
                     <div class="card-header">
-                        Horarios por Sección
+                        Actividad Reciente
                     </div>
                     <div class="card-body">
-                        <div class="schedule-view">
-                            <div class="schedule-day">
-                                <div class="day-label">Lunes</div>
-                                <div class="time-blocks">
-                                    <div class="time-block base" style="width: 50%;" title="Turno Base: 08:00-12:00">Base: 08:00-12:00</div>
-                                    <div class="time-block section" style="width: 50%;" title="Sección Logística: 12:00-16:00">Logística: 12:00-16:00</div>
-                                </div>
-                            </div>
-                            <div class="schedule-day">
-                                <div class="day-label">Martes</div>
-                                <div class="time-blocks">
-                                    <div class="time-block base" style="width: 50%;" title="Turno Base: 08:00-12:00">Base: 08:00-12:00</div>
-                                    <div class="time-block position" style="width: 30%;" title="Puesto Supervisor: 12:00-15:00">Supervisor: 12:00-15:00</div>
-                                    <div class="time-block employee" style="width: 20%;" title="Empleado Especial: 15:00-16:00">Especial: 15:00-16:00</div>
-                                </div>
-                            </div>
-                            <!-- Más días de la semana -->
-                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                    <th>Usuario</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15/05/2023 10:30</td>
+                                    <td>Registro de asistencia</td>
+                                    <td>Ana López</td>
+                                    <td>Entrada: 08:05 (Retardo leve)</td>
+                                </tr>
+                                <tr>
+                                    <td>15/05/2023 09:15</td>
+                                    <td>Solicitud de vacaciones</td>
+                                    <td>Carlos Ruiz</td>
+                                    <td>5 días - Pendiente de aprobación</td>
+                                </tr>
+                                <tr>
+                                    <td>14/05/2023 16:45</td>
+                                    <td>Modificación de turno</td>
+                                    <td>Administrador</td>
+                                    <td>Sección Logística: 07:00-15:00</td>
+                                </tr>
+                                <tr>
+                                    <td>14/05/2023 14:20</td>
+                                    <td>Creación de regla</td>
+                                    <td>Administrador</td>
+                                    <td>Supervisores +1 hora diaria</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -451,21 +484,40 @@
                 </div>
                 
                 <div id="visualizacion-tab" class="tab-content">
+                    <div class="scope-navigation">
+                        <div class="scope-btn active" data-scope="empresa">Empresa</div>
+                        <div class="scope-btn" data-scope="seccion">Sección</div>
+                        <div class="scope-btn" data-scope="puesto">Puesto</div>
+                        <div class="scope-btn" data-scope="colaborador">Colaborador</div>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
-                            Horarios por Nivel de Alcance
+                            <span id="scope-title">Horarios - Empresa</span>
                             <div>
-                                <select id="scope-select">
-                                    <option value="empresa">Empresa</option>
-                                    <option value="seccion">Sección</option>
-                                    <option value="puesto">Puesto</option>
-                                    <option value="empleado">Empleado</option>
+                                <select id="month-select">
+                                    <option value="0">Enero</option>
+                                    <option value="1">Febrero</option>
+                                    <option value="2">Marzo</option>
+                                    <option value="3">Abril</option>
+                                    <option value="4">Mayo</option>
+                                    <option value="5" selected>Junio</option>
+                                    <option value="6">Julio</option>
+                                    <option value="7">Agosto</option>
+                                    <option value="8">Septiembre</option>
+                                    <option value="9">Octubre</option>
+                                    <option value="10">Noviembre</option>
+                                    <option value="11">Diciembre</option>
+                                </select>
+                                <select id="year-select">
+                                    <option value="2023" selected>2023</option>
+                                    <option value="2024">2024</option>
                                 </select>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="schedule-container">
-                                <!-- Los horarios se cargarán aquí dinámicamente -->
+                            <div id="calendar-container">
+                                <!-- El calendario se cargará aquí dinámicamente -->
                             </div>
                         </div>
                     </div>
@@ -485,7 +537,7 @@
                                         <option value="base">Base (Empresa)</option>
                                         <option value="seccion">Sección</option>
                                         <option value="puesto">Puesto</option>
-                                        <option value="empleado">Empleado Individual</option>
+                                        <option value="colaborador">Colaborador Individual</option>
                                     </select>
                                 </div>
                                 
@@ -583,7 +635,7 @@
                                         <option value="empresa">Empresa</option>
                                         <option value="seccion">Sección</option>
                                         <option value="puesto">Puesto</option>
-                                        <option value="empleado">Empleado</option>
+                                        <option value="colaborador">Colaborador</option>
                                     </select>
                                 </div>
                                 
@@ -593,34 +645,573 @@
                             </form>
                         </div>
                     </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            Plantillas de Rotación Existentes
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Ciclo</th>
+                                        <th>Secuencia</th>
+                                        <th>Alcance</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Rotación Doble</td>
+                                        <td>Semanal</td>
+                                        <td>Mañana → Tarde</td>
+                                        <td>Sección</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Editar</button>
+                                            <button class="btn btn-danger btn-sm">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rotación Triple</td>
+                                        <td>Semanal</td>
+                                        <td>Mañana → Tarde → Noche</td>
+                                        <td>Empresa</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Editar</button>
+                                            <button class="btn btn-danger btn-sm">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fijo Diurno</td>
+                                        <td>Permanente</td>
+                                        <td>Siempre Mañana</td>
+                                        <td>Puesto</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Editar</button>
+                                            <button class="btn btn-danger btn-sm">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Más secciones (Reglas, Asistencias, Vacaciones, Reportes, Configuración) -->
-            <!-- Por brevedad, solo se muestra el esqueleto -->
+            <!-- Reglas Section -->
             <div id="reglas-section" class="content-section" style="display: none;">
-                <h2>Gestión de Reglas</h2>
-                <!-- Contenido de reglas -->
+                <div class="card">
+                    <div class="card-header">
+                        Reglas Laborales
+                        <button class="btn btn-primary" id="add-labor-rule-btn">Agregar Regla Laboral</button>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Alcance</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Jornada Máxima</td>
+                                    <td>Máximo 48 horas semanales</td>
+                                    <td>Empresa</td>
+                                    <td>Alta</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Descanso Mínimo</td>
+                                    <td>Mínimo 8 horas entre turnos</td>
+                                    <td>Empresa</td>
+                                    <td>Alta</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Día de Descanso</td>
+                                    <td>1 día de descanso por cada 6 laborados</td>
+                                    <td>Empresa</td>
+                                    <td>Alta</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Reglas Personalizables
+                        <button class="btn btn-primary" id="add-custom-rule-btn">Agregar Regla Personalizable</button>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Alcance</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Supervisores Horas Extra</td>
+                                    <td>Supervisores pueden exceder 1 hora diaria</td>
+                                    <td>Puesto</td>
+                                    <td>Media</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Temporada Alta</td>
+                                    <td>En temporada alta se permiten 10 horas diarias</td>
+                                    <td>Empresa</td>
+                                    <td>Baja</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Personal con Discapacidad</td>
+                                    <td>No rota turnos nocturnos</td>
+                                    <td>Colaborador</td>
+                                    <td>Alta</td>
+                                    <td>Activa</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Editar</button>
+                                        <button class="btn btn-danger btn-sm">Desactivar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
+            <!-- Asistencias Section -->
             <div id="asistencias-section" class="content-section" style="display: none;">
-                <h2>Registro de Asistencias</h2>
-                <!-- Contenido de asistencias -->
+                <div class="card">
+                    <div class="card-header">
+                        Registro de Asistencias
+                        <div>
+                            <input type="date" id="attendance-date" value="2023-06-15">
+                            <select id="attendance-section">
+                                <option value="all">Todas las secciones</option>
+                                <option value="logistica">Logística</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="contabilidad">Contabilidad</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Sección</th>
+                                    <th>Turno Planificado</th>
+                                    <th>Asistencia Real</th>
+                                    <th>Diferencia</th>
+                                    <th>Clasificación</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana López</td>
+                                    <td>Logística</td>
+                                    <td>08:00 – 16:00</td>
+                                    <td>08:05 – 16:10</td>
+                                    <td>+5 min entrada / +10 min salida</td>
+                                    <td>Retardo leve + hora extra</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Validar</button>
+                                        <button class="btn btn-warning btn-sm">Observación</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ruiz</td>
+                                    <td>Marketing</td>
+                                    <td>09:00 – 17:00</td>
+                                    <td>No registró</td>
+                                    <td>—</td>
+                                    <td>Inasistencia</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Validar</button>
+                                        <button class="btn btn-warning btn-sm">Observación</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Diana Pérez</td>
+                                    <td>Contabilidad</td>
+                                    <td>07:00 – 15:00</td>
+                                    <td>07:00 – 14:00</td>
+                                    <td>-1h salida anticipada</td>
+                                    <td>Salida anticipada</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Validar</button>
+                                        <button class="btn btn-warning btn-sm">Observación</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Luis Torres</td>
+                                    <td>Logística</td>
+                                    <td>10:00 – 18:00</td>
+                                    <td>09:55 – 18:05</td>
+                                    <td>-5/+5 min</td>
+                                    <td>Asistencia válida</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">Validar</button>
+                                        <button class="btn btn-warning btn-sm">Observación</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Métodos de Registro
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div style="text-align: center; padding: 15px; background: #e8f4fd; border-radius: 8px;">
+                                <h3>68%</h3>
+                                <p>App Móvil</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #e8f6f3; border-radius: 8px;">
+                                <h3>22%</h3>
+                                <p>Kiosco</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #fef9e7; border-radius: 8px;">
+                                <h3>8%</h3>
+                                <p>Portal Web</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: #fbeeee; border-radius: 8px;">
+                                <h3>2%</h3>
+                                <p>QR/NFC</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
+            <!-- Vacaciones y Permisos Section -->
             <div id="vacaciones-section" class="content-section" style="display: none;">
-                <h2>Vacaciones y Permisos</h2>
-                <!-- Contenido de vacaciones -->
+                <div class="card">
+                    <div class="card-header">
+                        Solicitudes Pendientes
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th>Periodo Solicitado</th>
+                                    <th>Días</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Carlos Ruiz</td>
+                                    <td>Vacaciones</td>
+                                    <td>15/06/2023</td>
+                                    <td>01/07/2023 - 05/07/2023</td>
+                                    <td>5</td>
+                                    <td>Pendiente</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Aprobar</button>
+                                        <button class="btn btn-danger btn-sm">Rechazar</button>
+                                        <button class="btn btn-primary btn-sm">Detalles</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>María González</td>
+                                    <td>Permiso Médico</td>
+                                    <td>14/06/2023</td>
+                                    <td>16/06/2023 - 18/06/2023</td>
+                                    <td>3</td>
+                                    <td>Pendiente</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Aprobar</button>
+                                        <button class="btn btn-danger btn-sm">Rechazar</button>
+                                        <button class="btn btn-primary btn-sm">Detalles</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jorge Martínez</td>
+                                    <td>Permiso Personal</td>
+                                    <td>13/06/2023</td>
+                                    <td>20/06/2023</td>
+                                    <td>1</td>
+                                    <td>Pendiente</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Aprobar</button>
+                                        <button class="btn btn-danger btn-sm">Rechazar</button>
+                                        <button class="btn btn-primary btn-sm">Detalles</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Saldos de Vacaciones
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Sección</th>
+                                    <th>Fecha Ingreso</th>
+                                    <th>Días Adquiridos</th>
+                                    <th>Días Tomados</th>
+                                    <th>Saldo Disponible</th>
+                                    <th>Próxima Acreditación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana López</td>
+                                    <td>Logística</td>
+                                    <td>15/03/2020</td>
+                                    <td>15</td>
+                                    <td>8</td>
+                                    <td>7</td>
+                                    <td>15/03/2024</td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ruiz</td>
+                                    <td>Marketing</td>
+                                    <td>22/08/2021</td>
+                                    <td>12</td>
+                                    <td>5</td>
+                                    <td>7</td>
+                                    <td>22/08/2024</td>
+                                </tr>
+                                <tr>
+                                    <td>Diana Pérez</td>
+                                    <td>Contabilidad</td>
+                                    <td>10/11/2019</td>
+                                    <td>16</td>
+                                    <td>12</td>
+                                    <td>4</td>
+                                    <td>10/11/2024</td>
+                                </tr>
+                                <tr>
+                                    <td>Luis Torres</td>
+                                    <td>Logística</td>
+                                    <td>05/05/2022</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                    <td>7</td>
+                                    <td>05/05/2024</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
+            <!-- Reportes y Auditoría Section -->
             <div id="reportes-section" class="content-section" style="display: none;">
-                <h2>Reportes y Auditoría</h2>
-                <!-- Contenido de reportes -->
+                <div class="card">
+                    <div class="card-header">
+                        Generar Reportes
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <h4>Reporte de Asistencias</h4>
+                                <p>Resumen de asistencias, retardos y ausencias</p>
+                                <button class="btn btn-primary">Generar</button>
+                            </div>
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <h4>Reporte de Horas Extras</h4>
+                                <p>Horas extras por colaborador y sección</p>
+                                <button class="btn btn-primary">Generar</button>
+                            </div>
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <h4>Reporte de Cumplimiento</h4>
+                                <p>Porcentaje de cumplimiento de horarios</p>
+                                <button class="btn btn-primary">Generar</button>
+                            </div>
+                            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <h4>Reporte de Vacaciones</h4>
+                                <p>Saldos y utilización de días de vacaciones</p>
+                                <button class="btn btn-primary">Generar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Registros de Auditoría
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Usuario</th>
+                                    <th>Módulo</th>
+                                    <th>Acción</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15/06/2023 10:30</td>
+                                    <td>admin</td>
+                                    <td>Asistencias</td>
+                                    <td>Validación</td>
+                                    <td>Ana López - Retardo leve aprobado</td>
+                                </tr>
+                                <tr>
+                                    <td>15/06/2023 09:15</td>
+                                    <td>carlos.ruiz</td>
+                                    <td>Vacaciones</td>
+                                    <td>Solicitud</td>
+                                    <td>5 días - 01/07 al 05/07/2023</td>
+                                </tr>
+                                <tr>
+                                    <td>14/06/2023 16:45</td>
+                                    <td>admin</td>
+                                    <td>Turnos</td>
+                                    <td>Modificación</td>
+                                    <td>Sección Logística: 07:00-15:00</td>
+                                </tr>
+                                <tr>
+                                    <td>14/06/2023 14:20</td>
+                                    <td>admin</td>
+                                    <td>Reglas</td>
+                                    <td>Creación</td>
+                                    <td>Supervisores +1 hora diaria</td>
+                                </tr>
+                                <tr>
+                                    <td>13/06/2023 11:05</td>
+                                    <td>maria.gonzalez</td>
+                                    <td>Asistencias</td>
+                                    <td>Registro</td>
+                                    <td>Entrada: 08:02 - App móvil</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             
+            <!-- Configuración Section -->
             <div id="configuracion-section" class="content-section" style="display: none;">
-                <h2>Configuración del Sistema</h2>
-                <!-- Contenido de configuración -->
+                <div class="card">
+                    <div class="card-header">
+                        Configuración General del Sistema
+                    </div>
+                    <div class="card-body">
+                        <form id="system-config-form">
+                            <div class="form-group">
+                                <label for="company-name">Nombre de la Empresa</label>
+                                <input type="text" id="company-name" value="Mi Empresa S.A.">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="work-days">Días Laborables</label>
+                                <div>
+                                    <label><input type="checkbox" name="work-days" value="1" checked> Lunes</label>
+                                    <label><input type="checkbox" name="work-days" value="2" checked> Martes</label>
+                                    <label><input type="checkbox" name="work-days" value="3" checked> Miércoles</label>
+                                    <label><input type="checkbox" name="work-days" value="4" checked> Jueves</label>
+                                    <label><input type="checkbox" name="work-days" value="5" checked> Viernes</label>
+                                    <label><input type="checkbox" name="work-days" value="6"> Sábado</label>
+                                    <label><input type="checkbox" name="work-days" value="0"> Domingo</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tolerance-margin">Margen de Tolerancia (minutos)</label>
+                                <input type="number" id="tolerance-margin" min="0" value="5">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="auto-break">Pausa Automática (minutos)</label>
+                                <input type="number" id="auto-break" min="0" value="60">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="max-overtime">Máximo Horas Extra Diarias</label>
+                                <input type="number" id="max-overtime" min="0" step="0.5" value="2">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="geofence-radius">Radio de Geocerca (metros)</label>
+                                <input type="number" id="geofence-radius" min="0" value="100">
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Métodos de Autenticación
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label><input type="checkbox" checked> Huella Digital</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" checked> Reconocimiento Facial</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" checked> Código QR</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" checked> Tarjeta NFC</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" checked> PIN</label>
+                        </div>
+                        <button class="btn btn-primary">Actualizar Métodos</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -673,6 +1264,7 @@
         let turnos = [...turnosPrecargados];
         let plantillas = [...plantillasRotacion];
         let reglas = [...reglasLaborales, ...reglasPersonalizables];
+        let currentScope = "empresa";
         
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -721,6 +1313,20 @@
                 });
             });
             
+            // Navegación por alcance
+            document.querySelectorAll('.scope-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remover clase active de todos los botones
+                    document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+                    // Agregar clase active al botón clickeado
+                    this.classList.add('active');
+                    
+                    currentScope = this.getAttribute('data-scope');
+                    document.getElementById('scope-title').textContent = `Horarios - ${currentScope.charAt(0).toUpperCase() + currentScope.slice(1)}`;
+                    cargarCalendario(currentScope);
+                });
+            });
+            
             // Formulario de turnos
             document.getElementById('turno-form').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -738,9 +1344,13 @@
                 crearPlantillaRotacion();
             });
             
-            // Selector de alcance
-            document.getElementById('scope-select').addEventListener('change', function() {
-                cargarHorariosPorAlcance(this.value);
+            // Selectores de mes y año
+            document.getElementById('month-select').addEventListener('change', function() {
+                cargarCalendario(currentScope);
+            });
+            
+            document.getElementById('year-select').addEventListener('change', function() {
+                cargarCalendario(currentScope);
             });
             
             // Modal
@@ -812,119 +1422,137 @@
                 tablaTurnos.appendChild(fila);
             });
             
-            // Cargar horarios por alcance
-            cargarHorariosPorAlcance(document.getElementById('scope-select').value);
+            // Cargar calendario por alcance
+            cargarCalendario(currentScope);
         }
         
-        function cargarHorariosPorAlcance(alcance) {
-            const container = document.getElementById('schedule-container');
+        function cargarCalendario(alcance) {
+            const container = document.getElementById('calendar-container');
             container.innerHTML = '';
             
-            // Generar visualización de horarios según el alcance
-            const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const month = parseInt(document.getElementById('month-select').value);
+            const year = parseInt(document.getElementById('year-select').value);
             
-            dias.forEach(dia => {
+            // Crear calendario mensual
+            const calendarView = document.createElement('div');
+            calendarView.className = 'calendar-view';
+            
+            // Encabezados de días
+            const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            daysOfWeek.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day';
+                dayHeader.innerHTML = `<div class="day-header">${day}</div>`;
+                calendarView.appendChild(dayHeader);
+            });
+            
+            // Días del mes
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            
+            // Ajustar para que la semana comience en lunes
+            let startDay = firstDay === 0 ? 6 : firstDay - 1;
+            
+            // Días vacíos al inicio
+            for (let i = 0; i < startDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarView.appendChild(emptyDay);
+            }
+            
+            // Días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
                 const dayElement = document.createElement('div');
-                dayElement.className = 'schedule-day';
+                dayElement.className = 'calendar-day';
+                dayElement.innerHTML = `<div class="day-header">${day}</div>`;
                 
-                const dayLabel = document.createElement('div');
-                dayLabel.className = 'day-label';
-                dayLabel.textContent = dia;
-                
-                const timeBlocks = document.createElement('div');
-                timeBlocks.className = 'time-blocks';
-                
-                // Generar bloques de tiempo según el alcance
+                // Agregar bloques de tiempo según el alcance
                 if (alcance === 'empresa') {
                     const block = document.createElement('div');
                     block.className = 'time-block base';
-                    block.style.width = '100%';
                     block.textContent = 'Base: 08:00-16:00';
                     block.setAttribute('title', 'Turno Base: 08:00-16:00');
                     block.addEventListener('click', () => mostrarDetallesTurno(1));
-                    timeBlocks.appendChild(block);
+                    dayElement.appendChild(block);
                 } else if (alcance === 'seccion') {
                     const block1 = document.createElement('div');
                     block1.className = 'time-block base';
-                    block1.style.width = '40%';
                     block1.textContent = 'Base: 08:00-12:00';
                     block1.setAttribute('title', 'Turno Base: 08:00-12:00');
                     block1.addEventListener('click', () => mostrarDetallesTurno(1));
                     
                     const block2 = document.createElement('div');
                     block2.className = 'time-block section';
-                    block2.style.width = '60%';
                     block2.textContent = 'Logística: 12:00-16:00';
                     block2.setAttribute('title', 'Sección Logística: 12:00-16:00');
                     block2.addEventListener('click', () => mostrarDetallesTurno(2));
                     
-                    timeBlocks.appendChild(block1);
-                    timeBlocks.appendChild(block2);
+                    dayElement.appendChild(block1);
+                    dayElement.appendChild(block2);
                 } else if (alcance === 'puesto') {
                     const block1 = document.createElement('div');
                     block1.className = 'time-block base';
-                    block1.style.width = '30%';
                     block1.textContent = 'Base: 08:00-11:00';
                     block1.setAttribute('title', 'Turno Base: 08:00-11:00');
                     block1.addEventListener('click', () => mostrarDetallesTurno(1));
                     
                     const block2 = document.createElement('div');
                     block2.className = 'time-block section';
-                    block2.style.width = '40%';
                     block2.textContent = 'Logística: 11:00-15:00';
                     block2.setAttribute('title', 'Sección Logística: 11:00-15:00');
                     block2.addEventListener('click', () => mostrarDetallesTurno(2));
                     
                     const block3 = document.createElement('div');
                     block3.className = 'time-block position';
-                    block3.style.width = '30%';
                     block3.textContent = 'Supervisor: 15:00-17:00';
                     block3.setAttribute('title', 'Puesto Supervisor: 15:00-17:00');
                     block3.addEventListener('click', () => mostrarDetallesTurno(3));
                     
-                    timeBlocks.appendChild(block1);
-                    timeBlocks.appendChild(block2);
-                    timeBlocks.appendChild(block3);
-                } else if (alcance === 'empleado') {
-                    // Para empleado, mostrar turno personalizado
-                    const block = document.createElement('div');
-                    block.className = 'time-block employee';
-                    block.style.width = '100%';
-                    block.textContent = 'Personalizado: 09:00-17:00';
-                    block.setAttribute('title', 'Turno Personalizado: 09:00-17:00');
-                    block.addEventListener('click', () => mostrarDetallesTurno(4));
-                    timeBlocks.appendChild(block);
+                    dayElement.appendChild(block1);
+                    dayElement.appendChild(block2);
+                    dayElement.appendChild(block3);
+                } else if (alcance === 'colaborador') {
+                    // Para colaborador, mostrar varios colaboradores
+                    const colaboradores = ['Ana López', 'Carlos Ruiz', 'Diana Pérez', 'Luis Torres'];
+                    colaboradores.forEach(colaborador => {
+                        const block = document.createElement('div');
+                        block.className = 'time-block employee';
+                        block.textContent = `${colaborador}: 09:00-17:00`;
+                        block.setAttribute('title', `${colaborador}: 09:00-17:00`);
+                        block.addEventListener('click', () => mostrarDetallesColaborador(colaborador));
+                        dayElement.appendChild(block);
+                    });
                 }
                 
-                dayElement.appendChild(dayLabel);
-                dayElement.appendChild(timeBlocks);
-                container.appendChild(dayElement);
-            });
+                calendarView.appendChild(dayElement);
+            }
+            
+            container.appendChild(calendarView);
         }
         
         function cargarReglas() {
-            // Cargar gestión de reglas
-            console.log("Cargando reglas...");
+            // Ya está cargado en el HTML
+            console.log("Reglas cargadas");
         }
         
         function cargarAsistencias() {
-            // Cargar módulo de asistencias
-            console.log("Cargando asistencias...");
+            // Ya está cargado en el HTML
+            console.log("Asistencias cargadas");
         }
         
         function cargarVacaciones() {
-            // Cargar módulo de vacaciones
-            console.log("Cargando vacaciones...");
+            // Ya está cargado en el HTML
+            console.log("Vacaciones cargadas");
         }
         
         function cargarReportes() {
-            // Cargar módulo de reportes
-            console.log("Cargando reportes...");
+            // Ya está cargado en el HTML
+            console.log("Reportes cargados");
         }
         
         function cargarConfiguracion() {
-            // Cargar configuración
-            console.log("Cargando configuración...");
+            // Ya está cargado en el HTML
+            console.log("Configuración cargada");
         }
         
         // Funciones para gestionar turnos
@@ -1052,8 +1680,7 @@
         }
         
         function mostrarDetallesTurno(id) {
-            const turno = turnos.find(t => t.id === id) || 
-                         { id: 4, nombre: "Turno Personalizado", tipo: "empleado", inicio: "09:00", fin: "17:00", descanso: 60, plantilla: null };
+            const turno = turnos.find(t => t.id === id);
             
             document.getElementById('modal-title').textContent = turno.nombre;
             document.getElementById('modal-body').innerHTML = `
@@ -1063,6 +1690,22 @@
                 <p><strong>Plantilla:</strong> ${turno.plantilla || 'Ninguna'}</p>
                 <div style="margin-top: 20px;">
                     <button class="btn btn-primary" onclick="editarTurno(${turno.id}); document.getElementById('turno-modal').style.display='none';">Editar Turno</button>
+                </div>
+            `;
+            
+            document.getElementById('turno-modal').style.display = 'flex';
+        }
+        
+        function mostrarDetallesColaborador(nombre) {
+            document.getElementById('modal-title').textContent = `Horario de ${nombre}`;
+            document.getElementById('modal-body').innerHTML = `
+                <p><strong>Colaborador:</strong> ${nombre}</p>
+                <p><strong>Sección:</strong> Logística</p>
+                <p><strong>Turno:</strong> 09:00 - 17:00</p>
+                <p><strong>Descanso:</strong> 60 minutos</p>
+                <p><strong>Plantilla:</strong> Rotación Doble</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary">Ver Detalles Completos</button>
                 </div>
             `;
             
@@ -1114,29 +1757,6 @@
             
             return true;
         }
-        
-        // Funciones para simular diferentes roles de usuario
-        function cambiarRol(rol) {
-            currentUser.rol = rol;
-            document.getElementById('user-role').textContent = 
-                rol === 'administrador' ? 'Administrador' : 
-                rol === 'formador' ? 'Formador/Jefe' : 
-                rol === 'colaborador' ? 'Colaborador' : 'RRHH';
-            
-            // Actualizar permisos según el rol
-            actualizarPermisos();
-        }
-        
-        function actualizarPermisos() {
-            // Ejemplo: Ocultar/mostrar elementos según el rol
-            const elementosAdmin = document.querySelectorAll('.admin-only');
-            const elementosFormador = document.querySelectorAll('.formador-only');
-            const elementosColaborador = document.querySelectorAll('.colaborador-only');
-            const elementosRRHH = document.querySelectorAll('.rrhh-only');
-            
-            // Implementar lógica de permisos según el rol
-            // Por simplicidad, no se implementa completamente en este ejemplo
-        }
     </script>
 </body>
-</html>            M
+</html>
